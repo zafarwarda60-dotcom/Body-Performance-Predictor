@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101714">
+  <title>Body Performance Predictor</title>
+  <link rel="stylesheet" href="/static/styles.css?v=dark-dashboard-2">
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div class="eyebrow"><span class="pulse"></span> BODY PERFORMANCE LAB</div>
+      <h1>Know your<br><em>baseline.</em></h1>
+      <p class="intro">Your movement, strength and endurance measurements, translated into two clear model predictions.</p>
+      <div class="hero-note"><span>01</span><span>13,387 cleaned records · two scikit-learn models</span></div>
+    </header>
+
+    <section class="scoreboard" aria-label="Model evaluation scores">
+      <div class="score-intro"><span class="step">MODEL CHECK</span><h2>Performance at a glance</h2><p>Held-out test set · 20% of cleaned data</p></div>
+      <article class="score-tile"><span class="score-label">R² SCORE</span><strong data-metric="regression.r2">—</strong><span>Body fat regression · closer to 1 is a better fit</span></article>
+      <article class="score-tile"><span class="score-label">MAE</span><strong><span data-metric="regression.mae">—</span><small> pp</small></strong><span>Average error · body fat</span></article>
+      <article class="score-tile"><span class="score-label">ACCURACY</span><strong data-metric="classification.accuracy_percent">—</strong><span>Performance class</span></article>
+    </section>
+
+    <section class="cards" aria-label="Prediction forms">
+      <article class="card regression">
+        <div class="card-head"><div><span class="step">MODEL 01</span><h2>Body fat estimate</h2></div><span class="icon">↗</span></div>
+        <p class="card-copy">Regression model · predicted percentage</p>
+        <form class="prediction-form" data-endpoint="/predict/regression" data-result="regression-result">
+          <div class="fields">
+            <label>Age <span>years · 21–64</span><input name="age" type="number" min="21" max="64" step="1" value="28" required></label>
+            <label>Gender<select name="gender"><option value="M">Male</option><option value="F">Female</option></select></label>
+            <label>Height <span>cm</span><input name="height_cm" type="number" min="125" max="193.8" step="0.1" value="173" required></label>
+            <label>Weight <span>kg</span><input name="weight_kg" type="number" min="26.3" max="138.1" step="0.1" value="70" required></label>
+            <label>Diastolic BP <span>mmHg</span><input name="diastolic" type="number" min="1" max="126" step="1" value="75" required></label>
+            <label>Systolic BP <span>mmHg</span><input name="systolic" type="number" min="77" max="201" step="1" value="120" required></label>
+            <label>Grip force <span>kg</span><input name="grip_force" type="number" min="0" max="70.5" step="0.1" value="40" required></label>
+            <label>Sit and reach <span>cm</span><input name="sit_bend_forward" type="number" min="-25" max="213" step="0.1" value="15" required></label>
+            <label>Sit-ups <span>count</span><input name="sit_ups_count" type="number" min="0" max="80" step="1" value="45" required></label>
+            <label>Broad jump <span>cm</span><input name="broad_jump_cm" type="number" min="0" max="303" step="1" value="210" required></label>
+          </div>
+          <button type="submit">Estimate body fat <span>→</span></button>
+          <output id="regression-result" class="result" aria-live="polite">Your estimate will appear here.</output>
+        </form>
+      </article>
+
+      <article class="card classification">
+        <div class="card-head"><div><span class="step">MODEL 02</span><h2>Performance class</h2></div><span class="icon">◈</span></div>
+        <p class="card-copy">Classifier · class A, B, C, or D</p>
+        <form class="prediction-form" data-endpoint="/predict/classification" data-result="classification-result">
+          <div class="fields">
+            <label>Age <span>years · 21–64</span><input name="age" type="number" min="21" max="64" step="1" value="28" required></label>
+            <label>Gender<select name="gender"><option value="M">Male</option><option value="F">Female</option></select></label>
+            <label>Height <span>cm</span><input name="height_cm" type="number" min="125" max="193.8" step="0.1" value="173" required></label>
+            <label>Weight <span>kg</span><input name="weight_kg" type="number" min="26.3" max="138.1" step="0.1" value="70" required></label>
+            <label>Diastolic BP <span>mmHg</span><input name="diastolic" type="number" min="1" max="126" step="1" value="75" required></label>
+            <label>Systolic BP <span>mmHg</span><input name="systolic" type="number" min="77" max="201" step="1" value="120" required></label>
+            <label>Grip force <span>kg</span><input name="grip_force" type="number" min="0" max="70.5" step="0.1" value="40" required></label>
+            <label>Sit and reach <span>cm</span><input name="sit_bend_forward" type="number" min="-25" max="213" step="0.1" value="15" required></label>
+            <label>Sit-ups <span>count</span><input name="sit_ups_count" type="number" min="0" max="80" step="1" value="45" required></label>
+            <label>Broad jump <span>cm</span><input name="broad_jump_cm" type="number" min="0" max="303" step="1" value="210" required></label>
+            <label>Body fat <span>% · optional</span><input name="body_fat" type="number" min="3" max="78.4" step="0.1" placeholder="Estimate if blank"></label>
+          </div>
+          <button type="submit">Predict class <span>→</span></button>
+          <output id="classification-result" class="result" aria-live="polite">Your prediction will appear here.</output>
+        </form>
+      </article>
+    </section>
+    <section class="charts" aria-label="Model charts">
+      <article class="chart-card confusion-card">
+        <div class="chart-heading"><div><span class="step">CLASSIFICATION</span><h2>Confusion matrix</h2></div><p>Actual class by predicted class</p></div>
+        <div id="confusion-chart" class="confusion-chart" aria-live="polite"><p class="chart-loading">Loading chart…</p></div>
+        <div class="chart-legend"><span></span>More correct predictions</div>
+      </article>
+      <article class="chart-card importance-card">
+        <div class="chart-heading"><div><span class="step">REGRESSION</span><h2>What influences the estimate?</h2></div><p>Feature importance · relative</p></div>
+        <div id="importance-chart" class="importance-chart" aria-live="polite"><p class="chart-loading">Loading chart…</p></div>
+        <p class="chart-footnote">Importance shows how much the model used each feature. It does not show cause and effect.</p>
+      </article>
+    </section>
+    <footer><span>SCIKIT-LEARN · FASTAPI</span><span>Estimates are for information only and are not medical advice.</span></footer>
+  </main>
+  <script src="/static/app.js?v=metrics-dashboard-2" defer></script>
+</body>
+</html>
